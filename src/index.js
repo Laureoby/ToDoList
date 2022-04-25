@@ -107,37 +107,3 @@ ReactDOM.render(
   </div>, 
   document.getElementById('root')
 )
-function PeopleList(props){
-  const arr =  props.data;
-  const ListItems = arr.map((val, index) =>
-    <li key={index}>{val}</li>);
-    return <ul>{ListItems}</ul>;
-}
-
-function ContactManager(props){
-  const [contacts, setContacts] = useState(props.data);
-
-  function addPerson(name){
-    setContacts([...contacts, name]);
-  }
-
-  return(
-    <div>
-      <AddPersonForm handleSubmit={addPerson}/>
-      <PeopleList data={contacts} />
-    </div>);
-}
-
-const contacts = ["Faire la lessive", "Manger le riz", "Aller au marché"];
-const el = (
-  <div>
-    <AddPersonForm />
-    <PeopleList data={contacts} />
-  </div>);
-
-ReactDOM.render(
-  el,
-  document.getElementById('root')
-)
-
-reportWebVitals();
