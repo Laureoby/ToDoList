@@ -1,109 +1,64 @@
+import React from 'react';
+import {useState} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import React from 'react';
 
-let taches = [{task: "Analyser le marché", Status: "Fait"},
-                {task: "Exposer le projet", Status: "En cour"},
-                  {task: "Avoir l'idée", Status: "Fait"},
-                  {task: "Valider le projet", Status: "En cour"},
-                  {task: "Collecter les données", Status: "En cour"},
-                  {task: "Faire des tests", Status: "En cour"},
-                  {task: "Définir le html", Status: "Pas fait"},
-                  {task: "Receuillir les avis", Status: "Pas fait"},
-                  {task: "Remplir le CSS", Status: "Pas fait"},
-                  {task: "Travailler le projet", Status: "Pas fait"}
-];
+//fonction pour créer le formulaire où on insère une nouvelle tâche
+function AddTaskForm(props){
+  const [task, setTask] = useState("");
 
-function TacheRow({tache}){
-  return <tr>
-      <td>{tache.task}</td>
-      <td>{tache.Status}</td>
-  </tr>
+  function handleChange(e){
+    setTask(e.target.value);
+  }
+
+  function handleSubmit(e){
+    props.handleSubmit(task);
+    setTask('');
+    e.preventDefault();
+  }
+  return(
+    <div className="container d-flex">
+      <form className="form form-group justify-content-center mx-auto" onSubmit={handleSubmit}>
+        <input type="text" value={task} placeholder="Ajouter une nouvelle tâche" onChange={handleChange}/>
+        <button className="btn btn-primary" type="submit">Ajouter</button>
+      </form>
+    </div>);
 }
 
-function TacheTable (){
-
-  const rows = []
-
-  taches.forEach(tache => {
-    rows.push(<TacheRow key={tache.task} tache={tache} />)
-  })
-
-  return <table className="table mt-4">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Etat de la tache</th>
-        </tr>
-      </thead>
-
-      <tbody>{rows}</tbody>
-    </table>
+//fonction qui insère les valeurs de la liste dans un tableau et les affiche
+function TaskList(props){
+  const arr = props.data;
+  const listItems =  arr.map((val, index) =>
+    <tr>
+      <td key={index}>{val}</td>
+    </tr>);
+  return <div>
+    <table className="table container table-bordered">
+      <th><tr><td>Liste de tâches</td></tr></th>
+      {listItems}</table>
+  </div>
 }
 
-class AddTask extends React.Component{
+//Fonction parent pour les fonctions précédemment crées
+function TaskManager(props){
+  const [taches, setTaches] = useState(props.data);
 
-    constructor(props){
-      super(props)
-      this.state = {
-        userInput: '',
-        userStatus: 'Etat de la tâche à effectuer',
-        rows: []
-      }
-      this.handleChange = this.handleChange.bind(this)
-      this.handleClick = this.handleClick.bind(this)
+  function addTask(name){
+    if (name == ""){
+      setTaches([...taches]);
+    }else{
+      setTaches([...taches, name]);
     }
+  }
 
-    handleChange(e){
-      this.setState({
-        userInput: e.target.value
-      })
-    }
-
-    handleClick(e){
-      e.preventDefault()
-      this.setState({
-        userInput: '',
-        userStatus: ''
-      })
-    }
-
-    render(){
-    return <div>
-      {/*Permet d'ajouter une tache*/}
-      <div className="form-group mt-4 mb-0">
-        <input type="text" value={this.state.userInput} className="form-control" placeholder="Tâche à ajouter" onChange={this.handleChange}/>
-      </div>
-      <div>
-        <select className="form-select">
-          <option>{this.state.userStatus}</option>
-          <option>Fait</option>
-          <option>Pas Fait</option>
-          <option>En cour</option>
-        </select>
-      </div>
-      <button onClick={this.handleClick} className="btn btn-primary mx-5 my-3">Ajouter une tâche</button>
-
-      {/*Partie pour supprimer*/}
-      <div className="form-group mt-4 mb-0">
-        <input type="text" className="form-control" placeholder="Rechercher la tâche à supprimer..."/>
-      </div>
-      <button className="btn btn-primary mx-5 my-3">Supprimer une tâche</button>
-    </div>}
+  return(<div className="container">
+      <h1 className="justify-content-center mx-auto">TODO LIST</h1>
+      <AddTaskForm handleSubmit={addTask}/>
+      <TaskList data={taches} />
+    </div>)
 }
 
-ReactDOM.render(
-  <div className="container">
-    <div className="row">
-      <div className="col-md-8">
-      <h1 className="titre_principal">TODO LIST</h1>
-      <TacheTable />
-      </div>
+//Variable qui contient les valeurs initiales de la liste
+const taches = ["Faire la vaiselle", "Aller au marché", "Laver les habits", "Préparer le ndolè plantain"];
 
-      <div className="col-md-4 mt-5">
-        <AddTask />
-      </div>
-    </div>
-  </div>, 
-  document.getElementById('root')
-)
+ReactDOM.render(<TaskManager data={taches}/>, document.getElementById('root'));
